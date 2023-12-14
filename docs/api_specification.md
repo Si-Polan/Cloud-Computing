@@ -533,3 +533,84 @@ Response Body Error :
     "errors": "Invalid payment request. Please check the details and try again."
 }
 ```
+
+# 5. Pusat Bantuan
+
+## Kategori Bantuan
+
+Endpoint: GET /api/v1/help/categories
+
+Response Body Success :
+
+```json
+{
+  "code": "200",
+  "status": "OK",
+  "message": "List of help categories retrieved successfully",
+  "data": [
+    {
+      "categoryId": 1,
+      "categoryName": "Account"
+    },
+    {
+      "categoryId": 2,
+      "categoryName": "Payments"
+    },
+    // Add more categories as needed
+  ]
+}
+```
+
+Response Body Error:
+
+```json
+{
+  "code": "500",
+  "status": "Internal Server Error",
+  "error": "Failed to retrieve help categories"
+}
+```
+
+
+## Pesan (Messages)
+
+Endpoint: POST /api/v1/help/messages
+
+Headers: Authorization: Bearer user-specific-token
+
+Request Body:
+
+```json
+{
+  "userId": "user-specific-id",
+  "categoryId": 1,
+  "message": "I'm having issues accessing my account."
+}
+```
+
+
+Response Body Success:
+
+```json
+{
+  "code": "201",
+  "status": "Created",
+  "message": "Help message sent successfully",
+  "data": {
+    "messageId": 123,
+    "userId": "user-specific-id",
+    "categoryId": 1,
+    "message": "I'm having issues accessing my account.",
+    "timestamp": "2023-04-01T09:30:00Z"
+  }
+}```
+
+Response Body Error
+
+```json
+{
+  "code": "400",
+  "status": "Bad Request",
+  "error": "Invalid request body"
+}
+```

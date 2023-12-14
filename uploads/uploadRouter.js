@@ -14,18 +14,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Endpoint untuk unggahan file (foto atau video)
-router.post('/upload', upload.single('file'), (req, res) => {
-  const fileType = req.file.mimetype.split('/')[0]; // Mendapatkan jenis file (photo atau video)
+// Endpoint untuk unggahan file (foto atau video) dan nomor plat
+router.post('/upload', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'licensePlate', maxCount: 1 }]), (req, res) => {
+  const photoOrVideo = req.files['file'][0];
+  const licensePlate = req.files['licensePlate'][0];
+  
+  // Proses unggahan file
+  const photoOrVideoPath = photoOrVideo.path;
+  const licensePlatePath = licensePlate.path;
 
-  if (fileType === 'image' || fileType === 'video') {
-    // Proses unggahan file
-    const filePath = req.file.path;
-    res.json({ message: 'File uploaded successfully', filePath, fileType });
-  } else {
-    // Jenis file tidak didukung
-    res.status(400).json({ error: 'Unsupported file type' });
-  }
+  res.json({
+    message: 'Files uploaded successfully',
+    photoOrVideo: { filePath: photoOrVideoPath, fileType: photoOrVideo.mimetype.split('/')[0] },
+    licensePlate: { filePath: licensePlatePath, fileType: licensePlate.mimetype.split('/')[0] }
+  });
 });
 
 module.exports = router;
