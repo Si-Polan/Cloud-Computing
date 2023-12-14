@@ -1,76 +1,78 @@
-// authController.js
 const bcrypt = require('bcrypt');
-const UserModel = require('../models/userModel'); // Assuming you have a user model
+const UserModel = require('../models/userModel'); // Mengimport model pengguna
 
 const authController = {
+  // Fungsi untuk mendaftarkan pengguna baru
   signup: async (req, res) => {
     try {
       const { fullname, email, password } = req.body;
-      // Hash the password before storing it
+      // Melakukan hash terhadap password sebelum disimpan
       const hashedPassword = await bcrypt.hash(password, 10);
-      // Save the user in the database
+      // Menyimpan pengguna di basis data
       const newUser = await UserModel.create({ fullname, email, password: hashedPassword });
-      res.json({ message: 'User signed up successfully', user: newUser });
+      res.json({ message: 'Pengguna berhasil mendaftar', user: newUser });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: 'Kesalahan server internal' });
     }
   },
 
+  // Fungsi untuk masuk/log masuk pengguna
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-      // Find the user by email in the database
+      // Mencari pengguna berdasarkan email di basis data
       const user = await UserModel.findOne({ where: { email } });
 
       if (!user) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+        return res.status(401).json({ error: 'Email atau password tidak valid' });
       }
 
-      // Compare the provided password with the stored hashed password
+      // Membandingkan password yang diberikan dengan password yang di-hash yang disimpan
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+        return res.status(401).json({ error: 'Email atau password tidak valid' });
       }
 
-      // TODO: Generate and send a token for authentication
-      res.json({ message: 'User logged in successfully', user });
+      // TODO: Menghasilkan dan mengirimkan token untuk otentikasi
+      res.json({ message: 'Pengguna berhasil masuk', user });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: 'Kesalahan server internal' });
     }
   },
 
-  // Other authentication functions like resetPassword, verifyAccount, etc.
+  // Fungsi otentikasi lainnya seperti resetPassword, verifyAccount, dll.
 
+  // Fungsi untuk mengedit akun pengguna
   editAccount: async (req, res) => {
     try {
       const { userId, newFullName, newPassword } = req.body;
-      // Find the user by ID in the database
+      // Mencari pengguna berdasarkan ID di basis data
       const user = await UserModel.findByPk(userId);
 
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
       }
 
-      // Update user details
+      // Memperbarui detail pengguna
       if (newFullName) {
         user.fullname = newFullName;
       }
 
       if (newPassword) {
-        // Hash the new password before updating
+        // Melakukan hash terhadap password baru sebelum memperbarui
         user.password = await bcrypt.hash(newPassword, 10);
       }
 
-      // Save the updated user in the database
+      // Menyimpan pengguna yang diperbarui di basis data
       await user.save();
 
-      res.json({ message: 'User details updated successfully', user });
+      res.json({ message: 'Detail pengguna berhasil diperbarui', user });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: 'Kesalahan server internal' });
     }
   },
 };
