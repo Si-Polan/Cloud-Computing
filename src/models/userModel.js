@@ -1,12 +1,7 @@
 // models/userModel.js
 
 const { Sequelize, DataTypes } = require('sequelize');
-const config = require('../config/database');
-
-const sequelize = new Sequelize(config[process.env.NODE_ENV].database, config[process.env.NODE_ENV].username, config[process.env.NODE_ENV].password, {
-    host: config[process.env.NODE_ENV].host,
-    dialect: config[process.env.NODE_ENV].dialect,
-  });
+const sequelize = require('../config/db'); // Menggunakan instance sequelize yang sama
 
 const User = sequelize.define('User', {
   fullname: {

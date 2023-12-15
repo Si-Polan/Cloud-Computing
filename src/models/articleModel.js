@@ -2,8 +2,13 @@
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./userModel');
 
 const Article = sequelize.define('Article', {
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },  
   title: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -31,5 +36,13 @@ const Article = sequelize.define('Article', {
     allowNull: false,
   },
 });
+
+// Sinkronisasi model dengan basis data
+Article.sync({ force: false }).then(() => {
+  console.log('Article model synced with database');
+});
+
+// Hubungan antara Article dan User
+Article.belongsTo(User);
 
 module.exports = Article;

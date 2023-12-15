@@ -76,9 +76,9 @@ Response Body Error :
 ```
 
 
-## Reset Password
+## Change Password
 
-Endpoint : POST /api/v1/auth/reset-password
+Endpoint : POST /api/v1/auth/change-password
 
 Request Body :
 ```json
@@ -92,7 +92,7 @@ Response Body Success :
 {
     "code": "200",
     "status": "OK",
-    "message": "Password reset request successful. An email with instructions has been sent to bimzbossftyoga@capstone.com"
+    "message": "Password change request successful. An email with instructions has been sent to bimzbossftyoga@capstone.com"
 }
 ```
 
@@ -107,7 +107,7 @@ Response Body Success :
 {
     "code": "200",
     "status": "OK",
-    "message": "Password reset successful"
+    "message": "Password change successful"
 }
 
 
@@ -263,34 +263,49 @@ Response Body Error :
 }
 ```
 
-Endpoint: POST /api/v1/articles/share
+## Detail Articles
+
+Endpoint: GET /api/v1/articles/:id
 
 Request Body :
 ```json
 {
     "articleId": 1,
-    "platform": "whatsapp"
 }
 ```
 
 Response Body Success :
 ```json
 {
-    "code": "200",
+     "code": "200",
     "status": "OK",
-    "message": "Article shared successfully",
+    "message": "Article details retrieved successfully",
     "data": {
-        "shareUrl": "https://example.com/articles/1/share/whatsapp"
-    }
+        "id": 1,
+        "title": "Introduction to Cloud Computing",
+        "content": "Lorem ipsum...",
+        "category": "technology",
+        "tags": ["cloud", "computing"],
+        "createdAt": "2023-01-15T12:30:45Z",
+        "updatedAt": "2023-01-15T15:20:10Z"
 }
 ```
 
-Response Body Error :
+Response Body Error (Article Not Found):
 ```json
 {
-    "code": "401",
-    "status": "Unauthorized",
-    "errors": "Invalid or expired token"
+    "code": "404",
+    "status": "Not Found",
+    "error": "Article not found for ID 1"
+}
+```
+
+Response Body Error (Invalid ID Format):
+```json
+{
+   "code": "400",
+    "status": "Bad Request",
+    "error": "Invalid article ID format"
 }
 ```
 
