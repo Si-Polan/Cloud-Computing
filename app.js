@@ -6,12 +6,17 @@ const logger = require('morgan');
 
 
 const authRoutes = require('./routes/auth');
-const articlesRoutes = require('./routes/articles');
+const articles = require('./routes/articles');
+const articlesDetail = require('./routes/articleDetail');
 const violationsRoutes = require('./routes/violations');
 const paymentRoutes = require('./routes/payment');
+const helpRoutes = require('./routes/help');
+
 
 // Import file router yang berisi endpoint untuk unggahan
 const uploadRouter = require('./uploads/uploadRouter');
+
+
 
 const app = express();
 
@@ -52,10 +57,14 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   });
   
 
-app.use('/auth', authRoutes);
-app.use('/articles', articlesRoutes);
-app.use('/violations', violationsRoutes);
-app.use('/payment', paymentRoutes);
-app.use('/uploads', uploadRouter);
+  app.use('/auth', authRoutes);
+  app.use('/articles', articles);
+  app.use('/articles/detail', articlesDetail);
+  app.use('/violations', violationsRoutes);
+  app.use('/payment', paymentRoutes);
+  app.use('/help', helpRoutes);
+  app.use('/uploads', uploadRouter);
+  
+
 
 module.exports = app;
