@@ -20,6 +20,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  vehicleNumberPlate: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  }
 });
 
 // Sinkronisasi model dengan basis data

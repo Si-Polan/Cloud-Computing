@@ -3,8 +3,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Payment = sequelize.define('Payment', {
-  invoiceId: {
-    type: DataTypes.STRING,
+  userId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   amount: {
@@ -13,19 +13,14 @@ const Payment = sequelize.define('Payment', {
   },
   timestamp: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
     allowNull: false,
   },
   status: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  userId: {
-    type: DataTypes.INTEGER, // Sesuaikan dengan tipe data yang sesuai dengan ID pengguna di model User
-    allowNull: false,
-  },
-  methodId: {
-    type: DataTypes.STRING, // Sesuaikan dengan tipe data yang sesuai dengan ID metode pembayaran
+  manualMethodId: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
   transactionId: {
@@ -34,9 +29,23 @@ const Payment = sequelize.define('Payment', {
   },
 });
 
-// Sinkronisasi model dengan basis data
-Payment.sync({ force: false }).then(() => {
-  console.log('Payment model synced with database');
+const ProofOfPayment = sequelize.define('ProofOfPayment', {
+  paymentId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  filePath: {
+    type: DataTypes.STRING, // Sesuaikan dengan tipe data yang sesuai
+    allowNull: false,
+  },
 });
 
-module.exports = Payment;
+Payment.hasOne(ProofOfPayment, { foreignKey: 'paymentId' });
+ProofOfPayment.belongsTo(Payment, { foreignKey: 'paymentId' });
+
+// Sinkronisasi model dengan basis data
+sequelize.sync({ force: false }).then(() => {
+  console.log('Models synced with database');
+});
+
+module.exports = { Payment, ProofOfPayment };

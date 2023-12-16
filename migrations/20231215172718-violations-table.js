@@ -16,6 +16,19 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
+      type: {
+        type: Sequelize.STRING, // Tambahkan kolom type
+        allowNull: false
+      },
+      vehicleNumberPlate: {
+        type: Sequelize.STRING, // Tambahkan kolom vehicleNumberPlate
+        allowNull: false
+      },
+      timestamp: {
+        type: Sequelize.DATE, // Tambahkan kolom timestamp
+        defaultValue: Sequelize.NOW,
+        allowNull: false
+      },
       userId: {
         type: Sequelize.INTEGER,
         allowNull: false,

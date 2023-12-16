@@ -1,69 +1,124 @@
-// paymentController.js
-
+const { v4: uuidv4 } = require('uuid');
 const paymentModel = require('../models/paymentModel');
 
-const paymentHistory = (req, res) => {
-  const userId = req.query.userId;
-  const limit = req.query.limit || 5;
+const paymentHistory = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const limit = req.query.limit || 5;
 
-  // Memanggil fungsi pada model untuk mendapatkan riwayat pembayaran
-  const payments = paymentModel.getPaymentHistory(userId, limit);
+    // Memanggil fungsi pada model untuk mendapatkan riwayat pembayaran
+    const payments = await paymentModel.getPaymentHistory(userId, limit);
 
-  res.status(200).json({
-    code: "200",
-    status: "OK",
-    message: "Payment history retrieved successfully",
-    data: {
-      payments: payments
-    }
-  });
-};
-
-const paymentMethod = (req, res) => {
-  // Memanggil fungsi pada model untuk mendapatkan metode pembayaran
-  const paymentMethods = paymentModel.getPaymentMethods();
-
-  res.status(200).json({
-    code: "200",
-    status: "OK",
-    message: "Payment methods retrieved successfully",
-    data: {
-      payment_methods: paymentMethods
-    }
-  });
-};
-
-const processPayment = (req, res) => {
-  const userId = req.body.userId;
-  const invoiceId = req.body.invoiceId;
-  const methodId = req.body.methodId;
-
-  // Validasi data
-  if (!userId || !invoiceId || !methodId) {
-    return res.status(400).json({
-      code: "400",
-      status: "Bad Request",
-      errors: "Invalid payment request. Please check the details and try again."
+    res.status(200).json({
+      code: 200,
+      status: "OK",
+      message: "Payment history retrieved successfully",
+      data: {
+        payments,
+      },
+    });
+  } catch (error) {
+    console.error('Error in paymentHistory:', error);
+    res.status(500).json({
+      code: 500,
+      status: "Internal Server Error",
+      errors: "Something went wrong",
     });
   }
+};
 
-  const transactionId = uuidv4();
+const paymentMethod = async (req, res) => {
+  try {
+    // Memanggil fungsi pada model untuk mendapatkan metode pembayaran
+    const paymentMethods = await paymentModel.getPaymentMethods();
 
-  // Memanggil fungsi pada model untuk menyimpan transaksi pembayaran
-  const savedTransaction = paymentModel.savePaymentTransaction(userId, invoiceId, methodId, transactionId);
+    res.status(200).json({
+      code: 200,
+      status: "OK",
+      message: "Payment methods retrieved successfully",
+      data: {
+        payment_methods: paymentMethods,
+      },
+    });
+  } catch (error) {
+    console.error('Error in paymentMethod:', error);
+    res.status(500).json({
+      code: 500,
+      status: "Internal Server Error",
+      errors: "Something went wrong",
+    });
+  }
+};
 
-  res.status(201).json({
-    code: "201",
-    status: "Created",
-    message: "Pembayaran Berhasil",
-    data: {
-      transactionId: transactionId
+const processPayment = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const invoiceId = req.body.invoiceId;
+    const methodId = req.body.methodId;
+
+    // Validasi data
+    if (!userId || !invoiceId || !methodId) {
+      return res.status(400).json({
+        code: 400,
+        status: "Bad Request",
+        errors: "Invalid payment request. Please check the details and try again.",
+      });
     }
-  });
+
+    // Fungsi untuk mendapatkan informasi pembayaran (misalnya, kode virtual account)
+    function generatePaymentInfo() {
+      // Menghasilkan kode virtual account secara acak
+      const virtualAccount = Math.floor(Math.random() * 1000000000000).toString();
+      return {
+        amount: '100000', // Ganti dengan jumlah pembayaran yang benar
+        manualMethod: 'Virtual Account',
+        virtualAccount,
+      };
+    }
+
+    // Mendapatkan informasi pembayaran
+    const paymentInfo = generatePaymentInfo();
+
+    // Menyimpan transaksi pembayaran ke tabel Payment
+    const savedTransaction = await paymentModel.createPayment({
+      userId,
+      amount: paymentInfo.amount,
+      timestamp: new Date(),
+      status: 'Pending', // Atur status sesuai dengan kebutuhan
+      manualMethod: paymentInfo.manualMethod,
+      transactionId: uuidv4(),
+    });
+
+    // Langkah konfirmasi pembayaran (contoh: mengunggah bukti pembayaran)
+    if (req.body.proofOfPayment) {
+      // Menggunakan Sequelize untuk menyimpan bukti pembayaran
+      await savedTransaction.createProofOfPayment({
+        filePath: req.body.proofOfPayment,
+      });
+      console.log('Proof of payment uploaded successfully.');
+    }
+
+    res.status(201).json({
+      code: 201,
+      status: "Created",
+      message: "Pembayaran Berhasil",
+      data: {
+        transactionId: savedTransaction.transactionId,
+        paymentInfo,
+      },
+    });
+  } catch (error) {
+    console.error('Error in processPayment:', error);
+    res.status(500).json({
+      code: 500,
+      status: "Internal Server Error",
+      errors: "Something went wrong",
+    });
+  }
 };
 
 module.exports = {
   paymentHistory,
   paymentMethod,
-  processPayment
+  processPayment,
 };

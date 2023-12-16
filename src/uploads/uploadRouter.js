@@ -1,5 +1,8 @@
 const express = require('express');
 const multer = require('multer');
+const path = require('path');
+const Violation = require('../models/violationModel');
+const User = require('../models/userModel'); // Pastikan path-nya benar
 
 const router = express.Router();
 
@@ -14,20 +17,34 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Endpoint untuk unggahan file (foto atau video) dan nomor plat
-router.post('/upload', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'licensePlate', maxCount: 1 }]), (req, res) => {
-  const photoOrVideo = req.files['file'][0];
-  const licensePlate = req.files['licensePlate'][0];
-  
-  // Proses unggahan file
-  const photoOrVideoPath = photoOrVideo.path;
-  const licensePlatePath = licensePlate.path;
+router.post('/upload', upload.single('file'), async (req, res) => {
+  try {
+    const fileType = req.file.mimetype.split('/')[0];
+    
+    if (fileType === 'image') {
+      const photoPath = req.file.path;
 
-  res.json({
-    message: 'Files uploaded successfully',
-    photoOrVideo: { filePath: photoOrVideoPath, fileType: photoOrVideo.mimetype.split('/')[0] },
-    licensePlate: { filePath: licensePlatePath, fileType: licensePlate.mimetype.split('/')[0] }
-  });
+      // Simpan informasi pelanggaran ke basis data
+      const violation = await Violation.create({
+        description: req.body.description,
+        type: req.body.type,
+        vehicleNumberPlate: req.body.vehicleNumberPlate,
+        timestamp: new Date(),
+        userId: req.body.userId, // Pastikan userId diset sesuai dengan informasi pengguna yang sedang terautentikasi
+        filePath: photoPath,
+      });
+
+      res.json({ message: 'Photo uploaded successfully', filePath: photoPath, violationId: violation.id });
+    } else {
+      res.status(400).json({ error: 'Unsupported file type' });
+    }
+  } catch (error) {
+    console.error('Error in file upload:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Something went wrong',
+    });
+  }
 });
 
 module.exports = router;
