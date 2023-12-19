@@ -13,7 +13,7 @@ const User = sequelize.define('User', {
     allowNull: false,
     unique: true,
     validate: {
-      isEmail: true,
+      isEmail: { msg: 'Invalid email format' },
     },
   },
   password: {
@@ -23,7 +23,15 @@ const User = sequelize.define('User', {
   vehicleNumberPlate: {
     type: DataTypes.STRING,
     allowNull: false,
-  }
+  },
+  otp: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 });
 
 // Sinkronisasi model dengan basis data

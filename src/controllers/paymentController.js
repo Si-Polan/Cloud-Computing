@@ -1,5 +1,10 @@
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer'); // Tambahkan baris ini untuk mengimpor modul multer
 const paymentModel = require('../models/paymentModel');
+const storageEngine = require('../utils/storageEngine');
+const upload = multer({ storage: storageEngine });
+
+const violationController = require('../controllers/violationController');
 
 const paymentHistory = async (req, res) => {
   try {
@@ -9,12 +14,16 @@ const paymentHistory = async (req, res) => {
     // Memanggil fungsi pada model untuk mendapatkan riwayat pembayaran
     const payments = await paymentModel.getPaymentHistory(userId, limit);
 
+    // Memanggil fungsi pada violationController untuk mendapatkan informasi pelanggaran
+    const violationDetails = await violationController.getUserViolations(userId, limit);
+
     res.status(200).json({
       code: 200,
       status: "OK",
       message: "Payment history retrieved successfully",
       data: {
         payments,
+        violationDetails,
       },
     });
   } catch (error) {
@@ -106,6 +115,7 @@ const processPayment = async (req, res) => {
         transactionId: savedTransaction.transactionId,
         paymentInfo,
       },
+    
     });
   } catch (error) {
     console.error('Error in processPayment:', error);
@@ -116,7 +126,7 @@ const processPayment = async (req, res) => {
     });
   }
 };
-
+  
 module.exports = {
   paymentHistory,
   paymentMethod,

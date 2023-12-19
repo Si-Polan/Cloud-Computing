@@ -7,14 +7,13 @@ const authController = {
   signup: async (req, res) => {
     try {
       const { fullname, email, vehicle_number_plate, password } = req.body.data;
-      const hashedPassword = await bcrypt.hash(password, 10);
 
       const existingUser = await UserModel.findOne({ where: { email } });
       if (existingUser) {
         return res.status(409).json({ code: '409', status: 'conflict', errors: 'Email sudah terdaftar' });
       }
 
-      const newUser = await UserModel.create({ fullname, email, vehicle_number_plate, password: hashedPassword });
+      const newUser = await UserModel.create({ fullname, email, vehicleNumberPlate: vehicle_number_plate, password });
 
       // Menghasilkan token untuk pengguna yang baru terdaftar
       const token = jwt.sign({ userId: newUser.id, email: newUser.email }, 'your-secret-key', { expiresIn: '1h' });
@@ -101,60 +100,78 @@ const authController = {
     }
   },
 
-  // Fungsi untuk memverifikasi akun pengguna menggunakan OTP
-  verifyAccountHandler: async (req, res) => {
-    try {
-      const { email, otp } = req.body;
-      // Logika untuk memverifikasi akun menggunakan OTP
+ // Fungsi untuk memverifikasi akun pengguna menggunakan OTP
+ verifyAccountHandler: async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await UserModel.findOne({ where: { email } });
 
-      res.json({
-        code: '200',
-        status: 'OK',
-        message: 'Verifikasi berhasil',
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(422).json({ code: '422', status: 'Unprocessable Entity', message: 'Kode OTP tidak valid', details: 'Silakan masukkan kode OTP yang valid.' });
+    if (!user || otp !== user.otp) {
+      return res.status(422).json({ code: '422', status: 'Unprocessable Entity', message: 'Kode OTP tidak valid', details: 'Silakan masukkan kode OTP yang valid.' });
     }
-  },
-  
-  // Fungsi untuk mengirim ulang kode OTP
-  resendOTPHandler: async (req, res) => {
-    try {
-      const { email } = req.body;
-      // Logika untuk mengirim ulang kode OTP
 
-      res.json({
-        code: '200',
-        status: 'OK',
-        message: 'Kode OTP berhasil dikirim ulang',
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(422).json({ code: '422', status: 'Unprocessable Entity', message: 'Gagal mengirim ulang kode OTP', details: 'Silakan coba lagi nanti.' });
+    // Set status user menjadi 'verified'
+    user.status = 'verified';
+    await user.save();
+
+    res.json({
+      code: '200',
+      status: 'OK',
+      message: 'Verifikasi berhasil',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(422).json({ code: '422', status: 'Unprocessable Entity', message: 'Kode OTP tidak valid', details: 'Silakan masukkan kode OTP yang valid.' });
+  }
+},
+
+// Fungsi untuk mengirim ulang kode OTP
+resendOTPHandler: async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ code: '404', status: 'Not Found', message: 'Pengguna tidak ditemukan' });
     }
-  },
 
-  // Fungsi untuk mengedit detail akun pengguna
-  editAccount: async (req, res) => {
-    try {
-      const { token, data } = req.body;
-      // Logika untuk mengedit detail akun pengguna
+    // Logika untuk mengirim ulang kode OTP
+    // Misalnya, Anda menghasilkan kode OTP baru dan mengirimkannya ke pengguna
+    const newOTP = generateNewOTP(); // Fungsi generateNewOTP harus diimplementasikan sesuai kebutuhan
+    user.otp = newOTP;
+    await user.save();
 
-      res.json({
-        code: '200',
-        status: 'OK',
-        message: 'Akun berhasil diperbarui',
-        data: {
-          updatedFields: ["fullname", "email"],
-          photoUrl: "https://example.com/path/to/new/photo.jpg",
-        },
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(401).json({ code: '401', status: 'Unauthorized', errors: 'Token tidak valid atau telah kedaluwarsa' });
-    }
-  },
+    res.json({
+      code: '200',
+      status: 'OK',
+      message: 'Kode OTP berhasil dikirim ulang',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(422).json({ code: '422', status: 'Unprocessable Entity', message: 'Gagal mengirim ulang kode OTP', details: 'Silakan coba lagi nanti.' });
+  }
+},
+
+// Fungsi untuk mengedit detail akun pengguna
+editAccount: async (req, res) => {
+  try {
+    const { token, data } = req.body;
+
+    // Logika untuk mengedit detail akun pengguna
+
+    res.json({
+      code: '200',
+      status: 'OK',
+      message: 'Akun berhasil diperbarui',
+      data: {
+        updatedFields: ["fullname", "email"],
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ code: '401', status: 'Unauthorized', errors: 'Token tidak valid atau telah kedaluwarsa' });
+  }
+},
 };
 
 module.exports = authController;

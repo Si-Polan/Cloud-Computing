@@ -1,4 +1,3 @@
-// payment-table.js
 'use strict';
 
 const { sequelize } = require('../models');
@@ -25,7 +24,7 @@ module.exports = {
         allowNull: false,
       },
       status: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       manualMethodId: {
@@ -33,6 +32,10 @@ module.exports = {
         allowNull: false,
       },
       transactionId: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      invoiceId: {
         type: Sequelize.STRING,
         allowNull: false,
       },

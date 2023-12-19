@@ -1,11 +1,17 @@
-// violations.js
 const express = require('express');
-const router = express.Router();
 const violationController = require('../controllers/violationController');
+const multerMiddleware = require('../middleware/multerMiddleware');
 
-// Routes for violations
-router.get('/latest-violations', violationController.latestViolations);
-router.get('/user-violations', violationController.userViolations);
-router.get('/:violationId', violationController.violationDetail);
+const router = express.Router();
+
+// Using multerMiddleware to handle image upload
+router.post(
+  '/violations',
+  multerMiddleware, // Correct usage, removed .single('file')
+  violationController.createViolation
+);
+
+router.get('/violations/latest', violationController.latestViolations);
+router.get('/violations/:violationId', violationController.violationDetail);
 
 module.exports = router;

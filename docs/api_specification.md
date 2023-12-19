@@ -288,6 +288,7 @@ Response Body Success :
         "tags": ["cloud", "computing"],
         "createdAt": "2023-01-15T12:30:45Z",
         "updatedAt": "2023-01-15T15:20:10Z"
+    }
 }
 ```
 
@@ -311,6 +312,55 @@ Response Body Error (Invalid ID Format):
 
 
 # 3. Violation Specification
+
+## Violations Today
+
+Endpoint: GET /api/v1/violations/today
+
+Response Body Success:
+```json
+{
+    "code": "200",
+    "status": "OK",
+    "message": "Successfully fetched violations today",
+    "data": {
+        "violations": [
+            {
+                "id": 1,
+                "location": "Jalan Kaliurang",
+                "timestamp": "2023-03-01T14:45:30Z",
+                "type": "Helmet",
+                "vehicleNumberPlate": "DK 2938 ACL",
+            },
+            {
+                "id": 2,
+                "location": "Jalan Kaliurang",
+                "timestamp": "2023-03-01T15:30:45Z",
+                "type": "Seatbelt",
+                "vehicleNumberPlate": "AB 1234 XYZ",
+            },
+            {
+                "id": 3,
+                "location": "Jalan Kaliurang",
+                "timestamp": "2023-03-01T16:20:00Z",
+                "type": "Red Light",
+                "vehicleNumberPlate": "CD 5678 MNO",
+            }
+        ]
+    }
+}
+
+
+```
+Response Body Error:
+```json
+{
+   "code": "404",
+    "status": "Not Found",
+    "errors": "No violations found today"
+}
+```
+
 
 ## Latest Violations
 

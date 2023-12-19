@@ -1,40 +1,34 @@
 const express = require('express');
-const path = require('path'); // Tambahkan baris ini untuk mengimpor modul path
+const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+const multerMiddleware = require('./src/middleware/multerMiddleware');
+
 const authRoutes = require('./src/routes/auth');
-const articles = require('./src/routes/articles');
-const articlesDetail = require('./src/routes/articleDetail');
+const articlesRoutes = require('./src/routes/articles');
 const violationsRoutes = require('./src/routes/violations');
 const paymentRoutes = require('./src/routes/payment');
 const helpRoutes = require('./src/routes/help');
-const multerMiddleware = require('./src/middleware/multerMiddleware'); // Import middleware multer
+const uploadRoutes = require('./src/routes/upload');
 
 const app = express();
 
-// Middleware untuk logging menggunakan morgan
 app.use(logger('dev'));
-
-// Middleware untuk parsing body dari request
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// Middleware untuk parsing cookie
 app.use(cookieParser());
 
-// Middleware untuk menyajikan file statis
+// Use multerMiddleware before the routes that handle file uploads
+app.use(multerMiddleware);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Gunakan Multer Middleware di endpoint tertentu
-app.use(multerMiddleware); // Gunakan middleware multer
-
-// Gunakan Router untuk setiap bagian aplikasi
 app.use('/auth', authRoutes);
-app.use('/articles', articles);
-app.use('/articles/detail', articlesDetail);
+app.use('/articles', articlesRoutes);
 app.use('/violations', violationsRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/help', helpRoutes);
+app.use('/upload', uploadRoutes);
 
 module.exports = app;

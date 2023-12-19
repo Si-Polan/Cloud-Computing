@@ -1,16 +1,12 @@
-const express = require('express');
 const multer = require('multer');
 const path = require('path');
 
-const router = express.Router();
-
-// Middleware untuk upload file menggunakan multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(null, `${Date.now()}-${file.originalname.replace(/\s/g, '_').toLowerCase()}`);
   }
 });
 
@@ -21,28 +17,14 @@ const fileFilter = (req, file, cb) => {
   if (allowedFileTypes.includes(fileType)) {
     cb(null, true);
   } else {
-    cb(new Error('Unsupported file type'));
+    cb(new Error('Unsupported file type'), false);
   }
 };
 
-const upload = multer({ 
+// Export middleware
+const multerMiddleware = multer({
   storage: storage,
   fileFilter: fileFilter,
-});
+}).single('file');
 
-// Endpoint untuk pengunggahan file
-router.post('/upload', upload.single('file'), (req, res) => {
-  const fileType = req.file.mimetype.split('/')[0];
-
-  if (fileType === 'image') {
-    const photoPath = req.file.path;
-    res.json({ message: 'Photo uploaded successfully', filePath: photoPath });
-  } else if (fileType === 'video') {
-    const videoPath = req.file.path;
-    res.json({ message: 'Video uploaded successfully', filePath: videoPath });
-  } else {
-    res.status(400).json({ error: 'Unsupported file type' });
-  }
-});
-
-module.exports = router;
+module.exports = multerMiddleware;

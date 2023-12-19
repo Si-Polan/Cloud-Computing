@@ -12,18 +12,29 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
-      username: {
-        type: Sequelize.STRING,
+      userId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true
+        references: {
+          model: 'users', // Sesuaikan dengan nama tabel user
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      email: {
-        type: Sequelize.STRING,
+      categoryId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true
-        }
+        references: {
+          model: 'helpCategories', // Sesuaikan dengan nama tabel helpCategories
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      message: {
+        type: Sequelize.TEXT,
+        allowNull: false
       },
       createdAt: {
         type: Sequelize.DATE,

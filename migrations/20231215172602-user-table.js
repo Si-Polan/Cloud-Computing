@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false,
         unique: true,
         validate: {
-          isEmail: true,
+          isEmail: { msg: 'Invalid email format' },
         },
       },
       password: {
@@ -29,6 +29,14 @@ module.exports = {
         allowNull: false,
       },
       vehicleNumberPlateplat: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      otp: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      status: {
         type: Sequelize.STRING,
         allowNull: false,
       },
