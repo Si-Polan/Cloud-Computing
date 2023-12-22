@@ -25,6 +25,10 @@ const Article = sequelize.define('Article', {
     type: DataTypes.JSON,
     allowNull: false,
   },
+  image: {
+    type: DataTypes.STRING,
+    allowNull:true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

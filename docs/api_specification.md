@@ -8,10 +8,12 @@ Request Body :
 ```json
 {
     "data" : {
-        "fullname" : "Aditya Yoga Adnyana Putra",
-        "email" : "bimzbossftyoga@capstone.com",
-        "vehicle_number_plate" : "DK 2938 ACL",
-        "password" : "password"
+        "fullname" : "Fayza Anindita",
+        "email" : "fayza@capstone.com",
+        "vehicle_number_plate" : "DK 1111 AL",
+        "password" : "password",
+        "otp" : "1212",
+        "status" : "verified"
     }
 } 
 ```
@@ -83,7 +85,10 @@ Endpoint : POST /api/v1/auth/change-password
 Request Body :
 ```json
 {
-    "email" : "bimzbossftyoga@capstone.com"
+    "email" : "bimzbossftyoga@capstone.com",
+    "old_password" : "password",
+    "new_password" : "password2",
+    "confirm_new_password" : "password2"
 }
 ```
 

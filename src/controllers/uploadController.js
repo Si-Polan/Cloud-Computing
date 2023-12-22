@@ -1,27 +1,29 @@
-const Violation = require('../models/violationModel');
-const Article = require('../models/articleModel');
-const ProofOfPayment = require('../models/proofOfPaymentModel');
+const articleModel = require('../models/articleModel');
+const violationModel = require('../models/violationModel');
+const proofOfPaymentModel = require('../models/proofOfPaymentModel');
 const ErrorResponse = require('../utils/errorResponse');
 
 exports.uploadFile = async (req, res, next) => {
   try {
-    const fileType = req.file.mimetype.split('/')[0];
     let model, modelName;
 
-    // Tentukan model berdasarkan jenis file
-    switch (fileType) {
-      case 'image':
-        model = Article;
+    // Tentukan model berdasarkan endpoint atau jenis file
+    switch (req.baseUrl) {
+      case '/articles':
+        model = articleModel;
         modelName = 'Article';
         break;
-      case 'video':
-        model = Violation;
+      case '/violations':
+        model = violationModel;
         modelName = 'Violation';
         break;
-      // Tambahkan jenis file lain jika diperlukan
-
+      case '/proof-of-payment':
+        model = proofOfPaymentModel;
+        modelName = 'Proof of Payment';
+        break;
+      // Tambahkan endpoint lain jika diperlukan
       default:
-        return next(new ErrorResponse('Unsupported file type', 400));
+        return next(new ErrorResponse('Unsupported endpoint', 400));
     }
 
     const filePath = req.file.path;
@@ -30,15 +32,13 @@ exports.uploadFile = async (req, res, next) => {
     const item = await model.create({
       description: req.body.description,
       type: req.body.type,
-      // Tambahkan field lain jika diperlukan
-      // ...
       timestamp: new Date(),
       userId: req.body.userId,
-      imageUrl: `URL_BASE/${filePath}`, // Ganti 'URL_BASE' sesuai kebutuhan Anda
+      imageUrl: filePath, // Simpan nama file saja, tidak perlu URL_BASE
     });
 
     res.json({
-      message: `${modelName} uploaded successfully`,
+      message: `${modelName} image uploaded successfully`,
       filePath: filePath,
       itemId: item.id,
     });

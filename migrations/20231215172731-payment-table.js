@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
       },
       status: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       manualMethodId: {
@@ -49,7 +49,7 @@ module.exports = {
       },
     });
 
-    await queryInterface.createTable('proof_of_payments', {
+    await queryInterface.createTable('proofOfPayments', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -82,7 +82,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('proof_of_payments');
+    await queryInterface.dropTable('proofOfPayments');
     await queryInterface.dropTable('payments');
   }
 };

@@ -6,14 +6,14 @@ const authController = {
   // Fungsi untuk mendaftarkan pengguna baru
   signup: async (req, res) => {
     try {
-      const { fullname, email, vehicle_number_plate, password } = req.body.data;
+      const { fullname, email, vehicle_number_plate, password, otp, status } = req.body.data;
 
       const existingUser = await UserModel.findOne({ where: { email } });
       if (existingUser) {
         return res.status(409).json({ code: '409', status: 'conflict', errors: 'Email sudah terdaftar' });
       }
 
-      const newUser = await UserModel.create({ fullname, email, vehicleNumberPlate: vehicle_number_plate, password });
+      const newUser = await UserModel.create({ fullname, email,  vehicle_number_plate, password, otp, status });
 
       // Menghasilkan token untuk pengguna yang baru terdaftar
       const token = jwt.sign({ userId: newUser.id, email: newUser.email }, 'your-secret-key', { expiresIn: '1h' });

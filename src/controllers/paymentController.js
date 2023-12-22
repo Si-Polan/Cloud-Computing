@@ -1,21 +1,29 @@
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer'); // Tambahkan baris ini untuk mengimpor modul multer
 const paymentModel = require('../models/paymentModel');
+const proofOfPaymentModel = require('../models/proofOfPaymentModel');
 const storageEngine = require('../utils/storageEngine');
 const upload = multer({ storage: storageEngine });
 
-const violationController = require('../controllers/violationController');
+const violationModel = require('../models/violationModel');
 
 const paymentHistory = async (req, res) => {
   try {
     const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({
+          code: 400,
+          status: "Bad Request",
+          errors: "Missing required userId parameter",
+      });
+}
     const limit = req.query.limit || 5;
 
     // Memanggil fungsi pada model untuk mendapatkan riwayat pembayaran
-    const payments = await paymentModel.getPaymentHistory(userId, limit);
+    const payments = await paymentModel.getPaymentHistory(userId,limit);
 
     // Memanggil fungsi pada violationController untuk mendapatkan informasi pelanggaran
-    const violationDetails = await violationController.getUserViolations(userId, limit);
+    const violationDetails = await violationModel.getUserViolations(userId,limit);
 
     res.status(200).json({
       code: 200,

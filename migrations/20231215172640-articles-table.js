@@ -28,6 +28,10 @@ module.exports = {
         type: Sequelize.JSON,
         allowNull: false,
       },
+      image: {
+        type: Sequelize.STRING, // Assuming image is stored as a string
+        allowNull: true, // Set to false if the image is required
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

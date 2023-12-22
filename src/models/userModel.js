@@ -20,7 +20,7 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  vehicleNumberPlate: {
+  vehicle_number_plate: {
     type: DataTypes.STRING,
     allowNull: false,
   },

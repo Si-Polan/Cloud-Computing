@@ -22,6 +22,12 @@ ProofOfPayment.init(
   }
 );
 
+
+// Sinkronisasi model dengan basis data
+ProofOfPayment.sync({ force: false }).then(() => {
+  console.log('ProofOfPayment model synced with database');
+});
+
 ProofOfPayment.belongsTo(Payment, { foreignKey: 'paymentId' });
 
 module.exports = ProofOfPayment;

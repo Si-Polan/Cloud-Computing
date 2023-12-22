@@ -11,6 +11,7 @@ router.post(
   violationController.createViolation
 );
 
+router.get('/violations/today', violationController.violationsToday);
 router.get('/violations/latest', violationController.latestViolations);
 router.get('/violations/:violationId', violationController.violationDetail);
 
